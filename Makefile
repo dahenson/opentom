@@ -20,7 +20,8 @@ export JOBS=-j6
 
 BUSYBOX_VER=1.22.1
 
-export LOGS=$(ROOT)/logs
+export BUILDDIR=$(ROOT)/build
+export LOGS=$(BUILDDIR)/logs
 export SOURCES=$(ROOT)/src
 export INITRAMFS_ROOT=$(ROOT)/initramfs
 export ARM_ROOT=arm-sysroot
@@ -287,7 +288,8 @@ libjpeg: $(ARM_ROOT)/usr/include/jpeglib.h
 $(ARM_ROOT)/usr/include/jpeglib.h: $(DOWNLOADS)/libjpeg-6b.tar.gz $(ARM_ROOT)
 	cd build && tar xf ../Downloads/libjpeg-6b.tar.gz && cd jpeg-6b && { \
 		./configure --prefix=$(ARM_APPROOT) --host=arm-linux --enable-shared --enable-static >$(LOGS)/libjpeg.log; \
-		make $(JOBS) install >>$(LOGS)/jpeglib.log 2>&1 ; \
+		./ltconfig ltmain.sh i686-unknown-linux; \
+		linux32 make $(JOBS) install >>$(LOGS)/jpeglib.log 2>&1 ; \
 	}
 
 libpng: $(ARM_ROOT)/usr/include/png.h
