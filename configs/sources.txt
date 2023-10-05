@@ -3,11 +3,11 @@
 wget https://web.archive.org/web/20071013013709/http://www.tomtom.com/gpl/toolchain_redhat_gcc-3.3.4_glibc-2.3.2-20060131a.tar.gz
 wget https://archive.org/download/golinux-tt1114405.tar.gz/golinux-tt1114405.tar.gz
 wget https://downloads.sourceforge.net/libpng/zlib-1.2.11.tar.gz
-wget ftp://ftp.pl.freebsd.org/vol/rzm4/GraphicsMagick/delegates/libjpeg-6b.tar.gz
+wget https://downloads.sourceforge.net/libpng/libpng16/older-releases/1.6.28/libpng-1.6.28.tar.gz
+wget -O libjpeg-6b.tar.gz http://www.ijg.org/files/jpegsrc.v6b.tar.gz
 wget http://download.savannah.gnu.org/releases/freetype/freetype-old/freetype-2.3.12.tar.gz
-wget http://downloads.sourceforge.net/project/libpng/libpng16/1.6.28/libpng-1.6.28.tar.gz
-[ -f $1 ] || { cd ../build && git clone git://microwindows.org/microwin && cd microwin && git checkout 9ffcd17 && cd .. && tar czf ../Downloads/microwin_9ffcd17.tgz microwin; }
-[ -f $1 ] || { cd ../build && git clone git://microwindows.org/nxlib && cd nxlib && git checkout 7adaf0e && cd .. && tar czf ../Downloads/nxlib_7adaf0e.tgz nxlib; }
+wget http://microwindows.censoft.com/pub/microwindows/microwindows-full-snapshot.tar.gz -O microwin_9ffcd17.tgz
+wget http://microwindows.censoft.com/pub/microwindows/nxlib-src-snapshot.tar.gz -O nxlib_7adaf0e.tgz
 wget http://www.libsdl.org/release/SDL-1.2.15.tar.gz
 wget http://www.libsdl.org/projects/SDL_image/release/SDL_image-1.2.12.tar.gz
 wget http://www.libsdl.org/projects/SDL_mixer/release/SDL_mixer-1.2.12.tar.gz
@@ -24,7 +24,7 @@ wget http://ftp.gnome.org/pub/gnome/sources/glib/2.14/glib-2.14.6.tar.gz
 wget https://archive.org/download/bluez-libs-2.15-tt350126.tar.gz/bluez-libs-2.15-tt350126.tar.gz
 wget https://curl.haxx.se/download/curl-7.51.0.tar.gz
 wget http://downloads.sourceforge.net/project/mad/libid3tag/0.15.1b/libid3tag-0.15.1b.tar.gz
-wget http://downloads.sourceforge.net/project/expat/expat/2.1.0/expat-2.1.0.tar.gz
+wget https://github.com/libexpat/libexpat/releases/download/R_2_1_0/expat-2.1.0.tar.gz
 wget http://downloads.sourceforge.net/project/espeak/espeak/espeak-1.48/espeak-1.48.02-source.zip
 wget http://www.portaudio.com/archives/pa_stable_v19_20140130.tgz
 wget http://www.nih.at/libzip/libzip-0.11.2.tar.gz
