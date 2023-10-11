@@ -368,10 +368,10 @@ $(ARM_ROOT)/usr/include/FL/Fl.H: $(DOWNLOADS)/fltk-1.3.2-source.tar.gz $(ARM_ROO
 glib1: $(ARM_ROOT)/usr/include/glib-1.2
 $(ARM_ROOT)/usr/include/glib-1.2: $(DOWNLOADS)/glib-1.2.10.tar.gz
 	chmod 755 $(ARM_APPROOT)/info/dir
-	cd build && { \
-		tar xf ../Downloads/glib-1.2.10.tar.gz && cd glib-1.2.10 && { \
-			patch -p1 <../../patchs/glib-1.2.10_ready2make_arm.patch; \
-			patch -p1 <../../patchs/glib-1.2.10_pretty_function.patch; \
+	cd $(LIBDIR) && { \
+		tar xf $(DOWNLOADS)/glib-1.2.10.tar.gz && cd glib-1.2.10 && { \
+			patch -p1 <../../../patchs/glib-1.2.10_ready2make_arm.patch; \
+			patch -p1 <../../../patchs/glib-1.2.10_pretty_function.patch; \
 			make $(JOBS) >$(LOGS)/glib1.log 2>&1; \
 			make install >>$(LOGS)/glib1.log; \
 		}; \
@@ -379,8 +379,8 @@ $(ARM_ROOT)/usr/include/glib-1.2: $(DOWNLOADS)/glib-1.2.10.tar.gz
 
 glib2: $(ARM_ROOT)/usr/include/glib-2.0
 $(ARM_ROOT)/usr/include/glib-2.0: $(DOWNLOADS)/glib-2.14.6.tar.gz
-	cd build && { \
-		tar xf ../Downloads/glib-2.14.6.tar.gz && cd glib-2.14.6 && { \
+	cd $(LIBDIR) && { \
+		tar xf $(DOWNLOADS)/glib-2.14.6.tar.gz && cd glib-2.14.6 && { \
 			cp $(CONFIGS)/glib2_config.cache_arm-linux config.cache; \
 			CFLAGS="" LDFLAGS="" CXXFLAGS="" CPPFLAGS="" ./configure --prefix=$(ARM_APPROOT) --host=arm-linux --cache-file=config.cache >$(LOGS)/glib2.log && \
 			make $(JOBS) install >>$(LOGS)/glib2.log; \
@@ -389,8 +389,8 @@ $(ARM_ROOT)/usr/include/glib-2.0: $(DOWNLOADS)/glib-2.14.6.tar.gz
 
 bluez-libs: $(ARM_ROOT)/usr/include/bluetooth/hci.h
 $(ARM_ROOT)/usr/include/bluetooth/hci.h: $(DOWNLOADS)/bluez-libs-2.15-tt350126.tar.gz
-	cd build && { \
-		tar xf ../Downloads/bluez-libs-2.15-tt350126.tar.gz && cd bluez-libs* && { \
+	cd $(LIBDIR) && { \
+		tar xf $(DOWNLOADS)/bluez-libs-2.15-tt350126.tar.gz && cd bluez-libs* && { \
 			./configure --prefix=$(ARM_SYSROOT)/usr --host=arm-linux >$(LOGS)/bluez-libs.log; \
 			make $(JOBS) install >>$(LOGS)/bluez-libs.log; \
 		} \
@@ -398,8 +398,8 @@ $(ARM_ROOT)/usr/include/bluetooth/hci.h: $(DOWNLOADS)/bluez-libs-2.15-tt350126.t
 
 curl: $(ARM_ROOT)/usr/include/curl/curl.h
 $(ARM_ROOT)/usr/include/curl/curl.h: $(DOWNLOADS)/curl-7.51.0.tar.gz
-	cd build && { \
-		tar xf ../Downloads/curl-7.51.0.tar.gz && cd curl-7.51.0 && { \
+	cd $(LIBDIR) && { \
+		tar xf $(DOWNLOADS)/curl-7.51.0.tar.gz && cd curl-7.51.0 && { \
 			./configure --prefix=$(ARM_APPROOT) --host=arm-linux >$(LOGS)/curl.log; \
 			make $(JOBS) install >>$(LOGS)/curl.log; \
 		} \
