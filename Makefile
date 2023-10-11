@@ -21,6 +21,8 @@ export JOBS=-j6
 BUSYBOX_VER=1.22.1
 
 export BUILDDIR=$(ROOT)/build
+export LIBDIR=$(BUILDDIR)/libs
+export APPDIR=$(BUILDDIR)/apps
 export LOGS=$(BUILDDIR)/logs
 export SOURCES=$(ROOT)/src
 export INITRAMFS_ROOT=$(ROOT)/initramfs
@@ -29,7 +31,7 @@ export ARM_SYSROOT=$(ROOT)/$(ARM_ROOT)
 export ARM_APPROOT=$(ARM_SYSROOT)/usr
 export CONFIGS=$(ROOT)/configs
 export TOMDIST=$(ROOT)/opentom_dist
-export DOWNLOADS=Downloads
+export DOWNLOADS=$(ROOT)/Downloads
 
 export ARMGCC=gcc-3.3.4_glibc-2.3.2
 export CROSS=$(ROOT)/$(ARMGCC)
@@ -52,6 +54,8 @@ export OBJCOPY=$(T_ARCH)-objcopy
 
 export CROSS_COMPILE=$(T_ARCH)-
 export ARCH=arm
+
+DIRS=$(DOWNLOADS) $(APPDIR) $(LIBDIR) $(BUILDDIR)/linux $(LOGS) $(BUILDDIR)/toolchain
 
 # Pour les progs utilisant libtool et son problème de --sysroot, créer un script dans /usr/local/bin/$(COMPILO)-gcc
 # qui contient
@@ -107,7 +111,6 @@ build/initramfs.cpio.gz: $(CONFIGS)/initramfs_prepend kernel/arch/arm/boot/zImag
 	kernel/usr/gen_init_cpio build/cpio_list | gzip -9 >build/initramfs.cpio.gz
 
 kernel/arch/arm/boot/zImage: $(ARM_ROOT) kernel/.config
-	mkdir -p $(LOGS)
 	cd kernel && make clean && nice -n 19 make $(JOBS) >$(LOGS)/kernel.log 2>&1
 
 kernel/.config: $(DOWNLOADS)/golinux-tt1114405.tar.gz
@@ -151,23 +154,22 @@ initramfs/etc/rc:
 # Busybox
 ###############
 
-initramfs/bin/busybox: initramfs/etc/rc build/busybox-$(BUSYBOX_VER)/_install/bin/busybox
-	cp -R build/busybox-$(BUSYBOX_VER)/_install/* initramfs
+initramfs/bin/busybox: initramfs/etc/rc $(APPDIR)/busybox-$(BUSYBOX_VER)/_install/bin/busybox
+	cp -R $(APPDIR)/busybox-$(BUSYBOX_VER)/_install/* initramfs
 
-build/busybox-$(BUSYBOX_VER)/_install/bin/busybox: build/busybox-$(BUSYBOX_VER) build/busybox-$(BUSYBOX_VER)/.config
-	cd build/busybox-$(BUSYBOX_VER) && { \
+$(APPDIR)/busybox-$(BUSYBOX_VER)/_install/bin/busybox: $(APPDIR)/busybox-$(BUSYBOX_VER) $(APPDIR)/busybox-$(BUSYBOX_VER)/.config
+	cd $(APPDIR)/busybox-$(BUSYBOX_VER) && { \
 		make $(JOBS) >$(LOGS)/busybox.log 2>&1 && \
 		make install >>$(LOGS)/busybox.log 2>&1 && \
 		chrpath -d _install/bin/busybox; \
 	}
 
 
-build/busybox-$(BUSYBOX_VER): $(DOWNLOADS)/busybox-$(BUSYBOX_VER).tar.bz2
-	mkdir -p build
-	cd build && tar xf ../Downloads/busybox-$(BUSYBOX_VER).tar.bz2
+$(APPDIR)/busybox-$(BUSYBOX_VER): $(DOWNLOADS)/busybox-$(BUSYBOX_VER).tar.bz2
+	cd $(APPDIR) && tar xf $(DOWNLOADS)/busybox-$(BUSYBOX_VER).tar.bz2
 
-build/busybox-$(BUSYBOX_VER)/.config:
-	cd build/busybox-$(BUSYBOX_VER) && { \
+$(APPDIR)/busybox-$(BUSYBOX_VER)/.config:
+	cd $(APPDIR)/busybox-$(BUSYBOX_VER) && { \
 		cp $(CONFIGS)/busybox_config.$(T_ARCH) .config; make silentoldconfig; }
 
 
@@ -569,7 +571,6 @@ clean_all:
 
 
 Downloads/%:
-	mkdir -p Downloads
 	get_source.sh $*
 
 help:
@@ -577,3 +578,5 @@ help:
 	@echo ""
 	@echo "Where <target> can be :"
 	@echo `grep : Makefile  | cut -f1 -d: | grep -v \( | grep -v build | grep -v \# | grep -v kernel | grep -v echo | grep -v initramfs | xargs`
+
+$(shell mkdir -p $(DIRS))
