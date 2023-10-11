@@ -487,15 +487,15 @@ tool_apps: csrinit bluez-utils pppd
 
 csrinit: $(TOMDIST)/bin/csrinit
 $(TOMDIST)/bin/csrinit: $(DOWNLOADS)/csrinit-tt531604.tar.gz
-	cd build && { \
-		tar xf ../Downloads/csrinit-tt531604.tar.gz; \
-		cd csrinit && patch -p1 <../../patchs/csrinit_lowTX.patch && arm-linux-gcc -o $(TOMDIST)/bin/csrinit -DSUPPORT_USB *.c -lusb; \
+	cd $(APPDIR) && { \
+		tar xf ../../Downloads/csrinit-tt531604.tar.gz; \
+		cd csrinit && patch -p1 <../../../patchs/csrinit_lowTX.patch && arm-linux-gcc -o $(TOMDIST)/bin/csrinit -DSUPPORT_USB *.c -lusb; \
 	}
 
 bluez-utils: $(ARM_ROOT)/usr/bin/rfcomm
 $(ARM_ROOT)/usr/bin/rfcomm: $(DOWNLOADS)/bluez-utils-2.15.tar.gz $(ARM_ROOT)/usr/include/bluetooth/hci.h
-	cd build && { \
-		tar xf ../Downloads/bluez-utils-2.15.tar.gz; \
+	cd $(APPDIR) && { \
+		tar xf $(DOWNLOADS)/bluez-utils-2.15.tar.gz; \
 		cd bluez-utils-2.15 && { \
 			./configure --prefix=$(ARM_APPROOT) --host=arm-linux; \
 			make install; \
@@ -507,8 +507,8 @@ $(ARM_ROOT)/usr/bin/rfcomm: $(DOWNLOADS)/bluez-utils-2.15.tar.gz $(ARM_ROOT)/usr
 
 pppd: $(TOMDIST)/bin/pppd
 $(TOMDIST)/bin/pppd: $(DOWNLOADS)/ppp-2.4.7.tar.gz
-	cd build && tar xf ../Downloads/ppp-2.4.7.tar.gz && cd ppp-2.4.7 && { \
-		patch -p1 <../../patchs/ppp-2.4.7_opentom.patch && \
+	cd $(APPDIR) && tar xf $(DOWNLOADS)/ppp-2.4.7.tar.gz && cd ppp-2.4.7 && { \
+		patch -p1 <../../../patchs/ppp-2.4.7_opentom.patch && \
 		./configure --prefix=$(ARM_APPROOT) --host=$(T_ARCH) >$(LOGS)/ppp.log && \
 		make -C pppd $(JOBS) install >>$(LOGS)/ppp.log && \
 		cp $(ARM_APPROOT)/sbin/pppd $(TOMDIST)/bin/pppd; \
