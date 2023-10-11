@@ -232,8 +232,8 @@ extra_libs: sdl_mixer sdl_image sdl_ttf libmad glib1 glib2 bluez-libs curl libid
 
 sdl: $(ARM_ROOT)/usr/include/SDL/SDL.h
 $(ARM_ROOT)/usr/include/SDL/SDL.h: $(DOWNLOADS)/SDL-1.2.15.tar.gz $(ARM_ROOT)/usr/include/microwin/nano-X.h
-	cd build && tar xf ../Downloads/SDL-1.2.15.tar.gz && cd SDL-1.2.15 && { \
-		patch -p1 <../../patchs/SDL-1.2.1_opentom.patch && \
+	cd $(LIBDIR) && tar xf $(DOWNLOADS)/SDL-1.2.15.tar.gz && cd SDL-1.2.15 && { \
+		patch -p1 <../../../patchs/SDL-1.2.1_opentom.patch && \
 		./configure --prefix=$(ARM_APPROOT) --host=arm-linux --disable-joystick --disable-cdrom --disable-alsa --disable-esd --disable-pulseaudio --disable-arts --disable-nas --disable-diskaudio --disable-mintaudio --disable-nasm --disable-altivec --disable-ipod --disable-video-x11 --disable-dga --disable-video-x11-vm --disable-video-x11-xv --disable-video-x11-xme --disable-video-x11-xrandr --disable-video-photon --disable-video-carbon --disable-cocoa --disable-ps2gs  --disable-ps3  --disable-ggi  --disable-svga  --disable-vgl  --disable-wscons --disable-video-aalib --disable-video-directfb --disable-video-caca --disable-video-qtopia --disable-video-picogui --disable-video-xbios --disable-video-gem --disable-video-opengl --disable-osmesa-shared --disable-screensaver --disable-directx --disable-atari-ldg  --enable-video-nanox --enable-nanox-share-memory --disable-video-fbcon >$(LOGS)/sdl.log; \
 		make $(JOBS) install >>$(LOGS)/sdl.log 2>&1 ; \
 	}
@@ -247,8 +247,8 @@ $(ARM_ROOT)/usr/include/freetype2/freetype/freetype.h: $(DOWNLOADS)/freetype-2.3
 
 sdl_mixer: $(ARM_ROOT)/usr/include/SDL/SDL_mixer.h
 $(ARM_ROOT)/usr/include/SDL/SDL_mixer.h: $(DOWNLOADS)/SDL_mixer-1.2.12.tar.gz $(ARM_ROOT)/usr/include/SDL/SDL.h
-	cd build && { \
-		tar xf ../Downloads/SDL_mixer-1.2.12.tar.gz && cd SDL_mixer* && { \
+	cd $(LIBDIR) && { \
+		tar xf $(DOWNLOADS)/SDL_mixer-1.2.12.tar.gz && cd SDL_mixer* && { \
 			./configure --prefix=$(ARM_APPROOT) --host=$(T_ARCH) --disable-music-mod --disable-smpegtest --disable-music-mp3 --enable-music-mp3-mad-gpl >$(LOGS)/SDL_mixer.log >$(LOGS)/SDL_mixer.log; \
 			make $(JOBS) install >>$(LOGS)/SDL_mixer.log 2>&1; \
 		} \
@@ -256,9 +256,9 @@ $(ARM_ROOT)/usr/include/SDL/SDL_mixer.h: $(DOWNLOADS)/SDL_mixer-1.2.12.tar.gz $(
 
 sdl_image: $(ARM_ROOT)/usr/include/SDL/SDL_image.h
 $(ARM_ROOT)/usr/include/SDL/SDL_image.h: $(DOWNLOADS)/SDL_image-1.2.12.tar.gz $(ARM_ROOT)/usr/include/SDL/SDL.h
-	cd build && { \
-		tar xf ../Downloads/SDL_image-1.2.12.tar.gz && cd SDL_image* && { \
-			patch -p1 <../../patchs/SDL_image_opentom.patch; \
+	cd $(LIBDIR) && { \
+		tar xf $(DOWNLOADS)/SDL_image-1.2.12.tar.gz && cd SDL_image* && { \
+			patch -p1 <../../../patchs/SDL_image_opentom.patch; \
 			./configure --prefix=$(ARM_APPROOT) --host=$(T_ARCH) >$(LOGS)/SDL_images.log; \
 			make $(JOBS) install >>$(LOGS)/SDL_images.log 2>&1; \
 		} \
@@ -266,12 +266,12 @@ $(ARM_ROOT)/usr/include/SDL/SDL_image.h: $(DOWNLOADS)/SDL_image-1.2.12.tar.gz $(
 
 sdl_ttf: $(ARM_ROOT)/usr/include/SDL/SDL_ttf.h
 $(ARM_ROOT)/usr/include/SDL/SDL_ttf.h: $(DOWNLOADS)/SDL_ttf-2.0.11.tar.gz
-	cd build && { \
-                tar xf ../Downloads/SDL_ttf-2.0.11.tar.gz && cd SDL_ttf* && { \
-                        ./configure --prefix=$(ARM_APPROOT) --host=$(T_ARCH) >$(LOGS)/SDL_ttf.log; \
-                        make $(JOBS) install >>$(LOGS)/SDL_ttf.log; \
-                } \
-        }
+	cd $(LIBDIR) && { \
+		tar xf $(DOWNLOADS)/SDL_ttf-2.0.11.tar.gz && cd SDL_ttf* && { \
+			./configure --prefix=$(ARM_APPROOT) --host=$(T_ARCH) >$(LOGS)/SDL_ttf.log; \
+			make $(JOBS) install >>$(LOGS)/SDL_ttf.log; \
+		} \
+	}
 
 sdl_net: $(ARM_ROOT)/usr/include/SDL/SDL_net.h
 $(ARM_ROOT)/usr/include/SDL/SDL_net.h:
@@ -407,8 +407,8 @@ $(ARM_ROOT)/usr/include/curl/curl.h: $(DOWNLOADS)/curl-7.51.0.tar.gz
 
 libid3tag: $(ARM_ROOT)/usr/include/id3tag.h
 $(ARM_ROOT)/usr/include/id3tag.h: $(DOWNLOADS)/libid3tag-0.15.1b.tar.gz
-	cd build && { \
-                tar xf ../Downloads/libid3tag-0.15.1b.tar.gz && cd libid3tag-0.15.1b && { \
+	cd $(LIBDIR) && { \
+                tar xf $(DOWNLOADS)/libid3tag-0.15.1b.tar.gz && cd libid3tag-0.15.1b && { \
 			./configure --prefix=$(ARM_APPROOT) --host=arm-linux >$(LOGS)/libid3tag.log; \
                         make $(JOBS) install >>$(LOGS)/libid3tag.log; \
                 } \
@@ -416,7 +416,7 @@ $(ARM_ROOT)/usr/include/id3tag.h: $(DOWNLOADS)/libid3tag-0.15.1b.tar.gz
 
 expat: $(ARM_ROOT)/usr/include/expat.h
 $(ARM_ROOT)/usr/include/expat.h: $(DOWNLOADS)/expat-2.1.0.tar.gz
-	cd build && tar xf ../Downloads/expat-2.1.0.tar.gz && cd expat-2.1.0 && { \
+	cd $(LIBDIR) && tar xf $(DOWNLOADS)/expat-2.1.0.tar.gz && cd expat-2.1.0 && { \
                 ./configure --prefix=$(ARM_APPROOT) --host=$(T_ARCH); \
                 make $(JOBS) install >/$(LOGS)/libexpat.log 2>&1; \
         }
