@@ -114,7 +114,7 @@ kernel/arch/arm/boot/zImage: $(ARM_ROOT) kernel/.config
 	cd kernel && make clean && nice -n 19 make $(JOBS) >$(LOGS)/kernel.log 2>&1
 
 kernel/.config: $(DOWNLOADS)/golinux-tt1114405.tar.gz
-	cd src && tar xf ../$(DOWNLOADS)/golinux-tt1114405.tar.gz
+	cd src && tar xf $(DOWNLOADS)/golinux-tt1114405.tar.gz
 	ln -s src/linux-s3c24xx kernel
 	cd kernel && patch -p1 <$(ROOT)/patchs/kernel_tt1114405_opentom.patch
 	cp $(CONFIGS)/kernel_config.no_console kernel/.config
@@ -179,18 +179,18 @@ $(APPDIR)/busybox-$(BUSYBOX_VER)/.config:
 
 distrib: libs apps verif_dist
 
-nano-X: tslib build/microwin/src $(ARM_ROOT)/usr/include/microwin/nano-X.h
+nano-X: tslib $(LIBDIR)/microwin/src $(ARM_ROOT)/usr/include/microwin/nano-X.h
 $(ARM_ROOT)/usr/include/microwin/nano-X.h: $(ARM_ROOT)/usr/include/zlib.h $(ARM_ROOT)/usr/include/jpeglib.h $(ARM_ROOT)/usr/include/freetype2/freetype/freetype.h $(ARM_ROOT)/usr/include/png.h
-	cd build/microwin/src && { \
+	cd $(LIBDIR)/microwin/src && { \
 		make >$(LOGS)/nanox.log 2>&1 && \
 		make install >>$(LOGS)/nanox.log 2>&1 && \
 		cp bin/convb* $(ARM_APPROOT)/bin; \
 	}
 
-build/microwin/src: $(DOWNLOADS)/microwin_9ffcd17.tgz
-	cd build && { \
+$(LIBDIR)/microwin/src: $(DOWNLOADS)/microwin_9ffcd17.tgz
+	cd $(LIBDIR) && { \
 		if ! test -d microwin; then \
-			tar xf ../Downloads/microwin_9ffcd17.tgz; \
+			tar xf $(DOWNLOADS)/microwin_9ffcd17.tgz; \
 		else \
 			touch microwin/src; \
 		fi; \
@@ -199,7 +199,7 @@ build/microwin/src: $(DOWNLOADS)/microwin_9ffcd17.tgz
 
 dropbear: $(TOMDIST)/bin/dropbear
 $(TOMDIST)/bin/dropbear: $(DOWNLOADS)/dropbear-2016.74.tar.bz2
-	cd build && tar xf ../Downloads/dropbear-2016.74.tar.bz2 && cd dropbear* && { \
+	cd $(APPDIR) && tar xf $(DOWNLOADS)/dropbear-2016.74.tar.bz2 && cd dropbear* && { \
 		./configure --host=arm-linux --prefix=$(ARM_APPROOT) --disable-lastlog --disable-utmp --disable-utmpx --disable-wtmp --disable-wtmpx --disable-loginfunc --disable-pututline --disable-pututxline --enable-bundled-libtom --disable-syslog --disable-largefile >$(LOGS)/dropbear.log && \
 		make $(JOBS) PROGRAMS="dropbear dbclient dropbearkey scp" >>$(LOGS)/dropbear.log && \
 		make install PROGRAMS="dropbear dbclient dropbearkey scp" >>$(LOGS)/dropbear.log && \
@@ -233,14 +233,14 @@ extra_libs: sdl_mixer sdl_image sdl_ttf libmad glib1 glib2 bluez-libs curl libid
 sdl: $(ARM_ROOT)/usr/include/SDL/SDL.h
 $(ARM_ROOT)/usr/include/SDL/SDL.h: $(DOWNLOADS)/SDL-1.2.15.tar.gz $(ARM_ROOT)/usr/include/microwin/nano-X.h
 	cd $(LIBDIR) && tar xf $(DOWNLOADS)/SDL-1.2.15.tar.gz && cd SDL-1.2.15 && { \
-		patch -p1 <../../../patchs/SDL-1.2.1_opentom.patch && \
+		patch -p1 <$(ROOT)/patchs/SDL-1.2.1_opentom.patch && \
 		./configure --prefix=$(ARM_APPROOT) --host=arm-linux --disable-joystick --disable-cdrom --disable-alsa --disable-esd --disable-pulseaudio --disable-arts --disable-nas --disable-diskaudio --disable-mintaudio --disable-nasm --disable-altivec --disable-ipod --disable-video-x11 --disable-dga --disable-video-x11-vm --disable-video-x11-xv --disable-video-x11-xme --disable-video-x11-xrandr --disable-video-photon --disable-video-carbon --disable-cocoa --disable-ps2gs  --disable-ps3  --disable-ggi  --disable-svga  --disable-vgl  --disable-wscons --disable-video-aalib --disable-video-directfb --disable-video-caca --disable-video-qtopia --disable-video-picogui --disable-video-xbios --disable-video-gem --disable-video-opengl --disable-osmesa-shared --disable-screensaver --disable-directx --disable-atari-ldg  --enable-video-nanox --enable-nanox-share-memory --disable-video-fbcon >$(LOGS)/sdl.log; \
 		make $(JOBS) install >>$(LOGS)/sdl.log 2>&1 ; \
 	}
 
 freetype2: $(ARM_ROOT)/usr/include/freetype2/freetype/freetype.h
 $(ARM_ROOT)/usr/include/freetype2/freetype/freetype.h: $(DOWNLOADS)/freetype-2.3.12.tar.gz
-	cd build && tar xf ../Downloads/freetype-2.3.12.tar.gz && cd freetype-2.3.12 && { \
+	cd $(LIBDIR) && tar xf $(DOWNLOADS)/freetype-2.3.12.tar.gz && cd freetype-2.3.12 && { \
 			./configure --prefix=$(ARM_APPROOT) --host=$(T_ARCH) >$(LOGS)/freetype2.log 2>&1; \
 			make $(JOBS) install >>$(LOGS)/freetype2.log 2>&1; \
 	}
@@ -258,7 +258,7 @@ sdl_image: $(ARM_ROOT)/usr/include/SDL/SDL_image.h
 $(ARM_ROOT)/usr/include/SDL/SDL_image.h: $(DOWNLOADS)/SDL_image-1.2.12.tar.gz $(ARM_ROOT)/usr/include/SDL/SDL.h
 	cd $(LIBDIR) && { \
 		tar xf $(DOWNLOADS)/SDL_image-1.2.12.tar.gz && cd SDL_image* && { \
-			patch -p1 <../../../patchs/SDL_image_opentom.patch; \
+			patch -p1 <$(ROOT)/patchs/SDL_image_opentom.patch; \
 			./configure --prefix=$(ARM_APPROOT) --host=$(T_ARCH) >$(LOGS)/SDL_images.log; \
 			make $(JOBS) install >>$(LOGS)/SDL_images.log 2>&1; \
 		} \
@@ -279,8 +279,8 @@ $(ARM_ROOT)/usr/include/SDL/SDL_net.h:
 
 libmad: $(ARM_ROOT)/usr/include/mad.h
 $(ARM_ROOT)/usr/include/mad.h: $(DOWNLOADS)/libmad-0.15.1b.tar.gz
-	cd build && { \
-		tar xf ../Downloads/libmad-0.15.1b.tar.gz && cd libmad* && {
+	cd $(LIBDIR) && { \
+		tar xf $(DOWNLOADS)/libmad-0.15.1b.tar.gz && cd libmad* && {
 			./configure --prefix=$(ARM_APPROOT) --host=$(T_ARCH) >$(LOGS)/libmad.log; \
 			make $(JOBS) install >>$(LOGS)/libmad.log 2>&1; \
 		} \
@@ -288,7 +288,7 @@ $(ARM_ROOT)/usr/include/mad.h: $(DOWNLOADS)/libmad-0.15.1b.tar.gz
 
 libjpeg: $(ARM_ROOT)/usr/include/jpeglib.h
 $(ARM_ROOT)/usr/include/jpeglib.h: $(DOWNLOADS)/libjpeg-6b.tar.gz $(ARM_ROOT)
-	cd build && tar xf ../Downloads/libjpeg-6b.tar.gz && cd jpeg-6b && { \
+	cd $(LIBDIR) && tar xf $(DOWNLOADS)/libjpeg-6b.tar.gz && cd jpeg-6b && { \
 		./configure --prefix=$(ARM_APPROOT) --host=arm-linux --enable-shared --enable-static >$(LOGS)/libjpeg.log; \
 		./ltconfig ltmain.sh i686-unknown-linux; \
 		linux32 make $(JOBS) install >>$(LOGS)/jpeglib.log 2>&1 ; \
@@ -296,21 +296,21 @@ $(ARM_ROOT)/usr/include/jpeglib.h: $(DOWNLOADS)/libjpeg-6b.tar.gz $(ARM_ROOT)
 
 libpng: $(ARM_ROOT)/usr/include/png.h
 $(ARM_ROOT)/usr/include/png.h: $(DOWNLOADS)/libpng-1.6.28.tar.gz
-	cd build && tar xf ../Downloads/libpng-1.6.28.tar.gz && cd libpng-1.6.28 && { \
+	cd $(LIBDIR) && tar xf $(DOWNLOADS)/libpng-1.6.28.tar.gz && cd libpng-1.6.28 && { \
 		./configure --prefix=$(ARM_APPROOT) --host=arm-linux --enable-shared --enable-static >$(LOGS)/libpng.log; \
 		make $(JOBS) install >>$(LOGS)/libpng.log 2>&1 ; \
 	}
 
 zlib: $(ARM_ROOT)/usr/include/zlib.h
 $(ARM_ROOT)/usr/include/zlib.h: $(DOWNLOADS)/zlib-1.2.11.tar.gz $(ARM_ROOT)
-	cd build && tar xf ../Downloads/zlib-1.2.11.tar.gz && cd zlib-1.2.11 && { \
+	cd $(LIBDIR) && tar xf $(DOWNLOADS)/zlib-1.2.11.tar.gz && cd zlib-1.2.11 && { \
 		LDSHARED="$(T_ARCH)-gcc -shared -Wl,-soname,libz.so.1" ./configure --shared --prefix=$(ARM_APPROOT) >$(LOGS)/zlib.log; \
 		make $(JOBS) install >>$(LOGS)/zlib.log 2>&1 ; \
 	}
 
 tslib: $(ARM_ROOT)/usr/include/tslib.h
 $(ARM_ROOT)/usr/include/tslib.h: $(ARM_ROOT) $(DOWNLOADS)/tslib-1.0.tar.bz2
-	cd build && tar xf ../Downloads/tslib-1.0.tar.bz2 && cd tslib-1.0 && { \
+	cd $(LIBDIR) && tar xf $(DOWNLOADS)/tslib-1.0.tar.bz2 && cd tslib-1.0 && { \
 		ac_cv_func_malloc_0_nonnull=yes ./autogen.sh >/$(LOGS)/tslib.log; \
 		./configure --prefix=$(ARM_APPROOT) --host=arm-linux >>/$(LOGS)/tslib.log; \
 		mv config.h temp ; grep -v rpl_malloc >config.h <temp ; rm temp; \
@@ -318,25 +318,25 @@ $(ARM_ROOT)/usr/include/tslib.h: $(ARM_ROOT) $(DOWNLOADS)/tslib-1.0.tar.bz2
 	}
 
 nxlib: $(ARM_ROOT)/usr/include/X11/X.h
-$(ARM_ROOT)/usr/include/X11/X.h: build/nxlib $(ARM_ROOT)/usr/include/microwin/nano-X.h
-	cd build/nxlib && { \
+$(ARM_ROOT)/usr/include/X11/X.h: $(LIBDIR)/nxlib $(ARM_ROOT)/usr/include/microwin/nano-X.h
+	cd $(LIBDIR)/nxlib && { \
 		make $(JOBS) >$(LOGS)/nxlib.log 2>&1 && \
 		make $(JOBS) install >>$(LOGS)/nxlib.log 2>&1 && \
-                cp -R X11 /usr/include/X11/cursorfont.h $(ARM_SYSROOT)/usr/include; \
+		cp -R X11 /usr/include/X11/cursorfont.h $(ARM_SYSROOT)/usr/include; \
 		cat $(CONFIGS)/x11.pc | sed 's#ARM_APPROOT#$(ARM_APPROOT)#' >$(ARM_APPROOT)/lib/pkgconfig/x11.pc; \
 		cat $(CONFIGS)/xext.pc | sed 's#ARM_APPROOT#$(ARM_APPROOT)#' >$(ARM_APPROOT)/lib/pkgconfig/xext.pc; \
 	}
 	cd $(ARM_ROOT)/usr/lib && ln -s libX11.so libX11.so.0
 
 
-build/nxlib: $(DOWNLOADS)/nxlib_7adaf0e.tgz
-	cd build && { \
-                if ! test -d nxlib; then \
-                        tar xf ../Downloads/nxlib_7adaf0e.tgz; \
-                else \
-                        touch nxlib; \
-		fi; \
-                cd nxlib && patch -p1 <$(ROOT)/patchs/nxlib_git_opentom.patch; \
+$(LIBDIR)/nxlib: $(DOWNLOADS)/nxlib_7adaf0e.tgz
+	cd $(LIBDIR) && { \
+	if ! test -d nxlib; then \
+		tar xf $(DOWNLOADS)/nxlib_7adaf0e.tgz; \
+	else \
+		touch nxlib; \
+	fi; \
+		cd nxlib && patch -p1 <$(ROOT)/patchs/nxlib_git_opentom.patch; \
 		cp -Rf /usr/include/X11 .; \
 	}
 
@@ -348,10 +348,10 @@ $(ARM_ROOT)/usr/include/FL/Fl.H: $(DOWNLOADS)/fltk-1.3.2-source.tar.gz $(ARM_ROO
 		false; \
 	fi
 	cp /usr/include/X11/Xlocale.h /usr/include/X11/cursorfont.h /usr/include/X11/Xmd.h $(ARM_SYSROOT)/usr/include/X11/
-	cd build && { \
+	cd $(LIBDIR) && { \
 		if ! test -d fltk-1.3.2*; then \
-			tar xf ../Downloads/fltk-1.3.2-source.tar.gz && cd fltk-1.3.2 && { \
-				patch -p1 <../../patchs/fltk-1.3.2_opentom_nxlib.patch; \
+			tar xf $(DOWNLOADS)/fltk-1.3.2-source.tar.gz && cd fltk-1.3.2 && { \
+				patch -p1 <$(ROOT)/patchs/fltk-1.3.2_opentom_nxlib.patch; \
 				mogrify -resize 50% test/pixmaps/black*.xbm test/pixmaps/white*.xbm; \
 				./configure --prefix=$(ARM_SYSROOT)/usr --host=arm-linux --x-includes=$(ARM_SYSROOT)/usr/include \
 					--x-libraries=$(ARM_SYSROOT)/usr/lib --enable-shared --disable-gl --disable-xdbe \
@@ -370,8 +370,8 @@ $(ARM_ROOT)/usr/include/glib-1.2: $(DOWNLOADS)/glib-1.2.10.tar.gz
 	chmod 755 $(ARM_APPROOT)/info/dir
 	cd $(LIBDIR) && { \
 		tar xf $(DOWNLOADS)/glib-1.2.10.tar.gz && cd glib-1.2.10 && { \
-			patch -p1 <../../../patchs/glib-1.2.10_ready2make_arm.patch; \
-			patch -p1 <../../../patchs/glib-1.2.10_pretty_function.patch; \
+			patch -p1 <$(ROOT)/patchs/glib-1.2.10_ready2make_arm.patch; \
+			patch -p1 <$(ROOT)/patchs/glib-1.2.10_pretty_function.patch; \
 			make $(JOBS) >$(LOGS)/glib1.log 2>&1; \
 			make install >>$(LOGS)/glib1.log; \
 		}; \
@@ -478,7 +478,7 @@ $(TOMDIST): nano-X
 	mkdir -p $(TOMDIST)/logs
 	cp -R src/opentom_skel/* $(TOMDIST)/
 	cp $(ARM_APPROOT)/bin/nano-X $(TOMDIST)/bin
-	cd build/microwin/src/bin && cp nanowm setportrait nxeyes nxclock nxroach nxmag nxview slider vnc $(TOMDIST)/bin
+	cd $(LIBDIR)/microwin/src/bin && cp nanowm setportrait nxeyes nxclock nxroach nxmag nxview slider vnc $(TOMDIST)/bin
 	mkdir -p $(TOMDIST)/lib/ts/
 	cp -R $(ARM_SYSROOT)/usr/lib/ts/*.so $(TOMDIST)/lib/ts/
 	cp $(ARM_SYSROOT)/usr/bin/ts_calibrate $(ARM_SYSROOT)/usr/bin/ts_test  $(TOMDIST)/bin
@@ -489,7 +489,7 @@ csrinit: $(TOMDIST)/bin/csrinit
 $(TOMDIST)/bin/csrinit: $(DOWNLOADS)/csrinit-tt531604.tar.gz
 	cd $(APPDIR) && { \
 		tar xf ../../Downloads/csrinit-tt531604.tar.gz; \
-		cd csrinit && patch -p1 <../../../patchs/csrinit_lowTX.patch && arm-linux-gcc -o $(TOMDIST)/bin/csrinit -DSUPPORT_USB *.c -lusb; \
+		cd csrinit && patch -p1 <$(ROOT)/patchs/csrinit_lowTX.patch && arm-linux-gcc -o $(TOMDIST)/bin/csrinit -DSUPPORT_USB *.c -lusb; \
 	}
 
 bluez-utils: $(ARM_ROOT)/usr/bin/rfcomm
@@ -508,7 +508,7 @@ $(ARM_ROOT)/usr/bin/rfcomm: $(DOWNLOADS)/bluez-utils-2.15.tar.gz $(ARM_ROOT)/usr
 pppd: $(TOMDIST)/bin/pppd
 $(TOMDIST)/bin/pppd: $(DOWNLOADS)/ppp-2.4.7.tar.gz
 	cd $(APPDIR) && tar xf $(DOWNLOADS)/ppp-2.4.7.tar.gz && cd ppp-2.4.7 && { \
-		patch -p1 <../../../patchs/ppp-2.4.7_opentom.patch && \
+		patch -p1 <$(ROOT)/patchs/ppp-2.4.7_opentom.patch && \
 		./configure --prefix=$(ARM_APPROOT) --host=$(T_ARCH) >$(LOGS)/ppp.log && \
 		make -C pppd $(JOBS) install >>$(LOGS)/ppp.log && \
 		cp $(ARM_APPROOT)/sbin/pppd $(TOMDIST)/bin/pppd; \

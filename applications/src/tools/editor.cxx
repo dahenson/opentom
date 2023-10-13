@@ -1,1 +1,1 @@
-../../../build/fltk-1.3.2/test/editor.cxx
+../../../build/libs/fltk-1.3.2/test/editor.cxx
